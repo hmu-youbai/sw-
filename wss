@@ -1,0 +1,76 @@
+import numpy
+
+aa=[]
+u=0
+result = []
+with open("aaa", "r") as file:
+    for line in file:
+        u=u+1
+        print(u)
+        line = line.strip('\n')
+        cc = line.split("\t")
+        seq1 = cc[0]
+        seq2 = cc[1]
+        zz = [0 for i in range(len(seq1) + 1)]
+        jiejie1 = []
+        jiejie2 = []
+        jiejie3 = zz
+        zj = 0
+        for i in range(1, len(seq2) + 1):
+            for j in range(1, len(seq1) + 1):
+                x = zz[j - 1]
+                y = zz[j]
+                z = zj
+                if (seq2[i - 1] == seq1[j - 1] or (seq2[i - 1] == "C" and seq1[j - 1] == "T")):
+                    match = 5
+                else:
+                    match = 0
+
+                gap1_score = z - 6
+                gap2_score = y - 6
+                match_score = x + match
+                score = max(gap1_score, gap2_score, match_score)
+                if score > 0:
+                    zj = score
+                else:
+                    zj = 0
+                jiejie1.append(zj)
+            jiejie2 = [0]
+            jiejie2.extend(jiejie1)
+            zz = jiejie2
+            jiejie3.extend(jiejie2)
+            jiejie1 = []
+            jiejie2 = []
+            zj = 0
+
+        best_matrix = numpy.array(jiejie3).reshape(len(seq2) + 1, len(seq1) + 1)
+        aa = numpy.where(best_matrix == numpy.max(best_matrix))
+        i = aa[0][-1]
+        j = aa[1][-1]
+        ks = i
+        s1 = ""
+        s2 = ""
+        while best_matrix[i, j] != 0:
+            if seq2[i - 1] == seq1[j - 1] or (seq2[i - 1] == "C" and seq1[j - 1] == "T"):
+                match = 5
+            else:
+                match = 0
+            if i > 0 and j > 0 and best_matrix[i, j] == best_matrix[i - 1, j - 1] + match:
+                s1 = s1 + seq1[j - 1]
+                s2 = s2 + seq2[i - 1]
+                i = i - 1
+                j = j - 1
+            elif i > 0 and best_matrix[i, j] == best_matrix[i - 1, j] - 6:
+                s1 = s1 + '-'
+                s2 = s2 + seq2[i - 1]
+                i = i - 1
+            else:
+                s1 = s1 + seq1[j - 1]
+                s2 = s2 + '-'
+                j = j - 1
+        result.append(s1)
+        result.append(s2)
+        result.append(ks)
+
+    file.close()
+
